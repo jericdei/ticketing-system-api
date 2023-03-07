@@ -48,11 +48,15 @@ class User extends Authenticatable
     ];
 
     protected $allowedFilters = [
-        'first_name', 'middle_name', 'last_name', 'email', 'username'
+        'id', 'first_name', 'middle_name', 'last_name', 'email', 'username'
     ];
 
     protected $allowedIncludes = [
         'position', 'department'
+    ];
+
+    protected $allowedSorts = [
+        'id', 'first_name', 'middle_name', 'last_name','created_at', 'updated_at', 'last_login'
     ];
 
     public function position(): BelongsTo

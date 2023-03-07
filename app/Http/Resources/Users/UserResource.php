@@ -28,6 +28,8 @@ class UserResource extends JsonResource
             'updated_at' => $this->updated_at,
             'position' => new PositionResource($this->whenLoaded('position')),
             'department' => new DepartmentResource($this->whenLoaded('department')),
-        ]);
+        ], function($value, $key) {
+            return !is_null($value) || $key === 'middle_name';
+        }, ARRAY_FILTER_USE_BOTH);
     }
 }
