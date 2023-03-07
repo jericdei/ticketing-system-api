@@ -22,13 +22,35 @@ class Ticket extends Model
         'status_updated_at', 'resolved_at'
     ];
 
+    protected $casts = [
+        'status_updated_at' => 'datetime',
+        'resolved_at' => 'datetime',
+    ];
+
     protected $searchables = [
         'ticket_code', 'subject', 'description'
     ];
 
-    protected $casts = [
-        'status_updated_at' => 'datetime',
-        'resolved_at' => 'datetime',
+    protected $allowedFields = [
+        'id', 'ticket_code', 'subject', 'description', 'is_follow_up', 'client_name',
+        'client_email', 'client_phone', 'with_email', 'user_id', 'department_id',
+        'type_id', 'status_id', 'priority_id', 'concern_id',
+        'status_updated_at', 'resolved_at', 'created_at', 'updated_at'
+    ];
+
+    protected $allowedFilters = [
+        'id', 'is_follow_up', 'with_email', 'user_id', 'department_id',
+        'type_id', 'status_id', 'priority_id', 'concern_id',
+        'status_updated_at', 'resolved_at', 'created_at', 'updated_at'
+    ];
+
+    protected $allowedIncludes = [
+        'user', 'department', 'concern', 'type', 'status', 'priority', 'replies', 'files'
+    ];
+
+    protected $allowedSorts = [
+        'id', 'type_id', 'status_id', 'priority_id', 'concern_id',
+        'status_updated_at', 'resolved_at','created_at', 'updated_at'
     ];
 
     public function user(): BelongsTo

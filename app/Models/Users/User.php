@@ -48,7 +48,7 @@ class User extends Authenticatable
     ];
 
     protected $allowedFilters = [
-        'id', 'first_name', 'middle_name', 'last_name', 'email', 'username'
+        'id', 'first_name', 'middle_name', 'last_name', 'email', 'username', 'position_id', 'department_id',
     ];
 
     protected $allowedIncludes = [
