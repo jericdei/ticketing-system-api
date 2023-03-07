@@ -2,6 +2,7 @@
 
 namespace App\Services\Common;
 
+use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -34,8 +35,12 @@ class QueryService
     {
         $query = $this->filterFieldsRelations($model::query(), $model, $request);
 
-        if ($request->has('filter')) {
-            $query = $this->filterModels($query, $model, $request->get('filter'));
+        if ($request->has('search')) {
+            $query = $this->searchModels($query, $model, $request->get('search'));
+        } else {
+            if ($request->has('filter')) {
+                $query = $this->filterModels($query, $model, $request->get('filter'));
+            }
         }
 
         if ($request->has('sort')) {
@@ -138,5 +143,16 @@ class QueryService
         }
 
         return $query;
+    }
+
+    public function searchModels(Builder $query, Model $model, string $search): Builder
+    {
+        $columns = $model->getAllowedSearches();
+
+        return $query->where(function ($query) use ($columns, $search) {
+            foreach(Arr::wrap($columns) as $column) {
+                $query->orWhere($column, 'LIKE', "%{$search}%");
+            }
+        });
     }
 }

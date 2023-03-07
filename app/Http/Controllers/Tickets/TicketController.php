@@ -2,18 +2,27 @@
 
 namespace App\Http\Controllers\Tickets;
 
-use App\Http\Controllers\Controller;
-use App\Models\Tickets\Ticket;
 use Illuminate\Http\Request;
+use App\Models\Tickets\Ticket;
+use App\Http\Controllers\Controller;
+use App\Services\Common\ModelService;
+use App\Services\Common\QueryService;
+use App\Http\Resources\Tickets\TicketResource;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class TicketController extends Controller
 {
+    public function __construct(
+        private QueryService $queryService,
+        private ModelService $modelService
+    ) {}
+
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request): JsonResource
     {
-        //
+        return TicketResource::collection($this->queryService->getMultiple(new Ticket, $request));
     }
 
     /**

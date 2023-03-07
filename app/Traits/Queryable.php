@@ -22,4 +22,9 @@ trait Queryable {
     {
         return $this->allowedIncludes;
     }
+
+    public function getAllowedSearches(): array
+    {
+        return $this->allowedSearches;
+    }
 }

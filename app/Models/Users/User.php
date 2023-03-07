@@ -3,19 +3,17 @@
 namespace App\Models\Users;
 
 use App\Traits\Queryable;
-use App\Traits\Searchable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
-    use HasRoles, HasApiTokens, HasFactory, Notifiable, SoftDeletes, Searchable, Queryable;
+    use HasRoles, HasApiTokens, HasFactory, Notifiable, SoftDeletes, Queryable;
 
     protected $table = 'users';
 
@@ -35,7 +33,7 @@ class User extends Authenticatable
         'last_login' => 'datetime',
     ];
 
-    protected $searchables = [
+    protected $allowedSearches = [
         'first_name', 'middle_name', 'last_name', 'username', 'email',
     ];
 

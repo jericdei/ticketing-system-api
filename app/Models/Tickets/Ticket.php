@@ -2,7 +2,7 @@
 
 namespace App\Models\Tickets;
 
-use App\Traits\Searchable;
+use App\Traits\Queryable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Ticket extends Model
 {
-    use HasFactory, SoftDeletes, Searchable;
+    use HasFactory, SoftDeletes, Queryable;
 
     protected $table = 'tickets';
 
@@ -27,8 +27,8 @@ class Ticket extends Model
         'resolved_at' => 'datetime',
     ];
 
-    protected $searchables = [
-        'ticket_code', 'subject', 'description'
+    protected $allowedSearches = [
+        'id', 'ticket_code', 'subject', 'description'
     ];
 
     protected $allowedFields = [
@@ -85,7 +85,7 @@ class Ticket extends Model
 
     public function replies(): HasMany
     {
-        return $this->hasMany(\App\Models\Tickets\Reply::class, 'ticket_id');
+        return $this->hasMany(\App\Models\Tickets\Replies\Reply::class, 'ticket_id');
     }
 
     public function files(): HasMany
