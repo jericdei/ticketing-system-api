@@ -23,7 +23,7 @@ class TicketFactory extends Factory
         $user = \App\Models\Users\User::inRandomOrder()->first();
 
         return [
-            'ticket_code' => Str::random(8),
+            'ticket_code' => fake()->unique()->regexify('[A-Za-z0-9]{8}'),
             'subject' => fake()->sentence(),
             'description' => fake()->paragraph(),
             'is_follow_up' => mt_rand(0, 1),

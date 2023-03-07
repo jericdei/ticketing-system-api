@@ -7,6 +7,7 @@ use App\Models\Tickets\Ticket;
 use App\Http\Controllers\Controller;
 use App\Services\Common\ModelService;
 use App\Services\Common\QueryService;
+use App\Http\Requests\Tickets\StoreRequest;
 use App\Http\Resources\Tickets\TicketResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -28,17 +29,22 @@ class TicketController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreRequest $request)
     {
-        //
+        $input = $request->validated();
+        $input['ticket_code'] = fake()->unique()->regexify('[A-Za-z0-9]{8}');
+
+        $ticket = $this->modelService->storeModel(new Ticket, $input);
+
+        return $this->sendResponseWithData('Ticket created successfully.', $this->show($ticket, request()));
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Ticket $ticket)
+    public function show(Ticket $ticket, Request $request): JsonResource
     {
-        //
+        return new TicketResource($this->queryService->getSingle($ticket, $request));
     }
 
     /**
