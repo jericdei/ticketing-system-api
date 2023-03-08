@@ -58,6 +58,10 @@ class QueryService
 
     public function filterFields(Builder $query, Model $model, array $fields): Builder
     {
+        if (!isset($fields[$model->getTable()])) {
+            return $query;
+        }
+
         return $query->select(explode(',', $fields[$model->getTable()]) ?? null);
     }
 

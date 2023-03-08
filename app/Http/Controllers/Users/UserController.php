@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Users;
 
 use App\Models\Users\User;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Users\StoreRequest;
 use App\Http\Requests\Users\UpdateRequest;
@@ -22,9 +21,9 @@ class UserController extends Controller
     /**
      * Get a list of users.
      */
-    public function index(Request $request): JsonResource
+    public function index(): JsonResource
     {
-        return UserResource::collection($this->queryService->getMultiple(new User, $request));
+        return UserResource::collection($this->queryService->getMultiple(new User, request()));
     }
 
     /**
@@ -40,9 +39,9 @@ class UserController extends Controller
     /**
      * Get a specified user.
      */
-    public function show(User $user, Request $request): JsonResource
+    public function show(User $user): JsonResource
     {
-        return new UserResource($this->queryService->getSingle($user, $request));
+        return new UserResource($this->queryService->getSingle($user, request()));
     }
 
     /**
