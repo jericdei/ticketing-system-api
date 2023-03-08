@@ -1,36 +1,51 @@
 name: Ticketing System
 
 services:
-  php:
-    container_name: php
-    build:
-        context: .
-        target: php
-        args:
-            - APP_ENV=${APP_ENV}
-    environment:
-        - APP_ENV=${APP_ENV}
-        - CONTAINER_ROLE=app
-    working_dir: /var/www
-    volumes:
-        - ./:/var/www
+  nginx:
+    image: nginx:stable-alpine
+    container_name: ${APP_NAME_UC}_nginx
     ports:
-        - 8000:8000
+      - "8000:80"
+    links:
+      - php
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx/site.conf:/etc/nginx/conf.d/default.conf:rw
+      - ./docker/logs/nginx/:/var/logs/nginx:rw
     depends_on:
-        - database
+      - php
+      - postgres
+    networks:
+      - ticketing_system
 
-  database:
-    container_name: database
-    image: mysql:8.0
-    ports:
-      - 3308:3306
-    environment:
-      - MYSQL_DATABASE=${DB_DATABASE}
-      - MYSQL_USER=${DB_USERNAME}
-      - MYSQL_PASSWORD=${DB_PASSWORD}
-      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+  php:
+    user: "1000:1000"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ${APP_NAME_UC}_php
     volumes:
-      - db-data:/var/lib/mysql
+      - ./:/var/www/html
+    ports:
+      - "9001:9000"
+    networks:
+      - ticketing_system
 
-volumes:
-  db-data: ~
+  postgres:
+    image: postgres:15.2-alpine
+    container_name: ${APP_NAME_UC}_postgres
+    restart: unless-stopped
+    ports:
+    - "5433:5432"
+    volumes:
+      - ./docker/postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_HOST_AUTH_METHOD: "trust"
+    networks:
+      - ticketing_system
+networks:
+  ticketing_system:
+    driver: bridge
