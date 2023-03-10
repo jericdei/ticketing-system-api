@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\Users\LoginRequest;
-use App\Http\Resources\Users\UserResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class AuthController extends UserController
@@ -18,7 +17,7 @@ class AuthController extends UserController
      */
     public function user(): JsonResource
     {
-        return $this->show(Auth::user(), request());
+        return $this->show(Auth::user());
     }
 
 
@@ -37,7 +36,7 @@ class AuthController extends UserController
             $user = User::where('username', $request->username)->first();
 
             return $this->sendResponseWithData('User logged in successfully.', [
-                'user' => new UserResource($user),
+                'user' => $this->show($user),
                 'token' => $user->createToken("{$user->first_name}'s Access Token")->plainTextToken
             ]);
         } catch (\Throwable $th) {

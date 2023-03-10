@@ -27,4 +27,9 @@ trait Queryable {
     {
         return $this->allowedSearches;
     }
+
+    public function hasAttribute(string $attr): bool
+    {
+        return in_array($attr, $this->getFillable());
+    }
 }

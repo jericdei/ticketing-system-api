@@ -5,6 +5,7 @@ namespace App\Exceptions;
 use Throwable;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Spatie\Permission\Exceptions\UnauthorizedException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Handler extends ExceptionHandler
@@ -43,12 +44,19 @@ class Handler extends ExceptionHandler
      */
     public function register(): void
     {
-        $this->renderable(function (NotFoundHttpException $e, $request) {
+        $this->renderable(function (NotFoundHttpException $e, Request $request) {
             if ($request->is('api/*')) {
-
                 return response()->json([
                     'message' => 'Record not found.'
                 ], 404);
+            }
+        });
+
+        $this->renderable(function (UnauthorizedException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'message' => 'Unauthorized access.'
+                ], 401);
             }
         });
     }

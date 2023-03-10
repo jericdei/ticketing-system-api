@@ -4,10 +4,12 @@ namespace App\Services\Common;
 
 use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Spatie\Permission\Exceptions\UnauthorizedException;
 
 class QueryService
 {
@@ -24,8 +26,12 @@ class QueryService
         'bw' => 'BETWEEN'
     ];
 
-    public function getSingle(Model $model, Request $request): Model
+    public function getSingle(Model $model, Request $request): Model|UnauthorizedException
     {
+        if (!$this->hasPermissionToModel($model)) {
+            throw new UnauthorizedException(401);
+        }
+
         $query = $this->filterFieldsRelations($model::query(), $model, $request);
 
         return $query->where('id', $model->id)->firstOrFail();
@@ -33,7 +39,8 @@ class QueryService
 
     public function getMultiple(Model $model, Request $request): Collection|LengthAwarePaginator
     {
-        $query = $this->filterFieldsRelations($model::query(), $model, $request);
+        $query = $this->filterRole($model::query(), $model);
+        $query = $this->filterFieldsRelations($query, $model, $request);
 
         if ($request->has('search')) {
             $query = $this->searchModels($query, $model, $request->get('search'));
@@ -158,5 +165,41 @@ class QueryService
                 $query->orWhere($column, 'LIKE', "%{$search}%");
             }
         });
+    }
+
+    public function filterRole(Builder $query, Model $model): Builder
+    {
+        switch(Auth::user()->roles->pluck('name')[0]) {
+            case 'Admin':
+                break;
+            case 'Department Admin':
+                if ($model->hasAttribute('department_id')) {
+                    $query->where('department_id', Auth::user()->department_id);
+                }
+
+                break;
+            case 'User':
+                if ($model->hasAttribute('user_id')) {
+                    $query->where('user_id', Auth::id());
+                }
+
+                break;
+        }
+
+        return $query;
+    }
+
+    public function hasPermissionToModel(Model $model)
+    {
+        $user = Auth::user();
+
+        switch($user->roles->pluck('name')[0]) {
+            case 'Admin':
+            case 'Department Admin' && $model->department_id === $user->department_id:
+            case 'User' && $model->user_id === $user->id;
+                return true;
+            default:
+                return false;
+        }
     }
 }
