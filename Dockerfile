@@ -1,9 +1,17 @@
 FROM php:8.2-fpm-alpine
 
-RUN set -ex \
-    && apk --no-cache add postgresql-dev \
-    && docker-php-ext-install pdo pdo_pgsql
+ARG uid
+ARG user
 
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+RUN apk add --no-cache shadow postgresql-dev
+RUN docker-php-ext-install pdo pdo_pgsql
 
-WORKDIR /var/www/html
+RUN useradd -G www-data,root -u $uid -d /home/$user $user
+RUN mkdir -p /home/$user/.composer && chown -R $user:$user /home/$user
+RUN chown -R $user:$user /var/www
+
+COPY --from=composer /usr/bin/composer /usr/bin/composer
+
+WORKDIR /var/www
+USER $user
+
