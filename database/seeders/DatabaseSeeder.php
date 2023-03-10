@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
         \App\Models\Users\User::factory(100)->create()->each(function($user) {
             $user->assignRole(\Spatie\Permission\Models\Role::inRandomOrder()->first()->name);
         });
-        \App\Models\Tickets\Ticket::factory(100)->create();
+        \App\Models\Tickets\Ticket::factory(1000)->create();
         \App\Models\Tickets\Replies\Reply::factory(200)->create();
         \App\Models\Tickets\File::factory(50)->create();
         \App\Models\Tickets\Replies\File::factory(50)->create();

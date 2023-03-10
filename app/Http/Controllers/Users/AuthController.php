@@ -16,9 +16,9 @@ class AuthController extends UserController
      * Get the authenticated user's data.
      *
      */
-    public function me(Request $request): JsonResource
+    public function user(): JsonResource
     {
-        return $this->show(Auth::user(), $request);
+        return $this->show(Auth::user(), request());
     }
 
 
@@ -33,11 +33,12 @@ class AuthController extends UserController
                 return $this->sendResponse('Credentials does not match.', 401);
             }
 
+            $request->session()->regenerate();
             $user = User::where('username', $request->username)->first();
 
             return $this->sendResponseWithData('User logged in successfully.', [
                 'user' => new UserResource($user),
-                'token' => $user->createToken('Access Token')->plainTextToken
+                'token' => $user->createToken("{$user->first_name}'s Access Token")->plainTextToken
             ]);
         } catch (\Throwable $th) {
             return $this->sendResponse($th->getMessage(), 500);
@@ -50,7 +51,9 @@ class AuthController extends UserController
      */
     public function logout(Request $request): JsonResponse
     {
-        $request->user()->currentAccessToken()->delete();
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
         return $this->sendResponse('User logged out successfully.');
     }
