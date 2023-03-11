@@ -21,9 +21,15 @@ class TicketController extends Controller
     /**
      * Get a list of tickets.
      */
-    public function index(): JsonResource
+    public function index(): JsonResource|int
     {
-        return TicketResource::collection($this->queryService->getMultiple(new Ticket, request()));
+        $tickets = $this->queryService->getMultiple(new Ticket, request());
+
+        if (request()->has('count')) {
+            return $tickets->count();
+        }
+
+        return TicketResource::collection($tickets);
     }
 
     /**

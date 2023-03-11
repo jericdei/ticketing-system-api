@@ -1,10 +1,11 @@
 <?php
 
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\LogoutController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Users\AuthController;
 
-Route::post('auth/login', [AuthController::class, 'login']);
+Route::post('auth/login', LoginController::class);
 
 Route::middleware('auth')->group(function () {
-    Route::post('auth/logout', [AuthController::class, 'logout']);
+    Route::post('auth/logout', LogoutController::class);
 });
